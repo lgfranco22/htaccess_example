@@ -1,0 +1,28 @@
+RewriteEngine on
+Options All -Indexes
+
+# Deny from all
+# Certifique-se de que essa diretiva não interferindo com o acesso aos recursos estáticos
+
+# Route WWW Redirect
+ReWriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+## ROUTER HTTPS Redirect
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ROUTER URL Rewrite
+RewriteCond %{SCRIPT_FILENAME} !-f
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [QSA]
+
+# Error documents
+ErrorDocument 403 /403.html
+ErrorDocument 404 /404.html
+
+# Permitir o acesso a recursos estáticos mesmo em caso de erro 403
+<FilesMatch "\.(jpg|jpeg|png|gif|bmp|ico|css|js)$">
+    Allow from all
+</FilesMatch>
